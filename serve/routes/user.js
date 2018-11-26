@@ -26,7 +26,7 @@ router.post('/login', function(req, res, next) {
           userName: doc.userName,
         }, '登录成功')
       } else {
-        utils.fail(res, { message: '账号或密码错误!!' })
+        utils.fail(res, { message: '账号或密码错误!!' }, '账号或密码错误')
       }
     }
   })
@@ -80,9 +80,13 @@ router.get('/cart', function(req, res, next) {
 })
 
 // 购物车删除
-router.post('/delcart', function(req, res, next) {
+router.post('/cart/del', function(req, res, next) {
   const userId = req.cookies.userId;
-  const productId = req.body.productId;
+  const productId = req.body.productId
+  if (!productId) {
+    utils.fail(res, { message: '商品id为空' }, '错误')
+    return;
+  }
   userModel.update({
     userId
   }, {
@@ -91,11 +95,42 @@ router.post('/delcart', function(req, res, next) {
         'productId': productId
       }
     }
-  }, function (err, doc) {
+  }, function(err) {
     const flag = utils.result(res, err);
     if (flag === 'success') {
-      utils.sussess(res, '', '删除成功！')
+      utils.sussess(res, '', '删除成功')
     }
   })
 })
+
+// 购物车编辑
+router.post('/cart/edit', function(req, res, next) {
+  const userId = req.cookies.userId;
+  const productId = req.body.productId;
+  const productNum = req.body.productNum;
+  if (!productId) {
+    utils.fail(res, { message: '商品id为空' }, '错误')
+    return;
+  }
+  if (!productNum) {
+    utils.fail(res, { message: '商品数量为空' }, '错误')
+    return;
+  }
+  userModel.update(
+    {
+      'userId': userId,
+      'cartList.productId': productId
+    },
+    {
+      'cartList.$.productNum': productNum
+    },
+    function(err, doc) {
+      const flag = utils.result(res, err)
+      if (flag === 'success') {
+        utils.sussess(res, doc, '更新成功')
+      }
+    }
+  )
+})
+
 module.exports = router;

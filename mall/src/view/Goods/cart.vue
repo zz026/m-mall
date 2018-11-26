@@ -1,9 +1,10 @@
 <template>
-  <Table :columns="columns1" :data="tableList" />
+  <Table stripe border size="small" highlight-row :loading="loading" :height="600" :columns="columns1" :data="tableList" />
 </template>
 
 <script>
-import { getCartRequest, delCartRequest } from '@/api/good'
+import { getCartRequest, delCartRequest, editCartRequest } from '@/api/good';
+import { elConfirm, elLoading } from '@/utils/tipTools';
 
 export default {
   data() {
@@ -39,9 +40,17 @@ export default {
           render: (h, params) => {
             return h('InputNumber', {
               props: {
+                min: 1,
                 max: 10,
                 value: params.row.productNum,
                 size: 'small'
+              },
+              on: {
+                'on-change': (val) => {
+                  // that.tableList[params.index].productNum = val
+                  params.row.productNum = val
+                  this.handleChangeNum(params.row)
+                }
               }
             });
           }
@@ -64,24 +73,41 @@ export default {
           }
         }
       ],
+      loading: false,
       tableList: []
     }
   },
   methods: {
+    // 获取列表
     async getList() {
+      this.loading = true;
       const res = await getCartRequest()
+      this.loading = false;
       if (!res.errCodeTip) {
-        console.log(res)
         this.tableList = res.list
       }
     },
+    // 删除商品
     async handleDelect(item) {
-      console.log('item', item)
+      await elConfirm(`确认删除 ${item.productName} ? `)
       const res = await delCartRequest({
         productId: item.productId
       });
       if (!res.errCodeTip) {
-        console.log(res)
+        this.$Message.success(`${item.productName}删除成功！`);
+        this.getList()
+      }
+    },
+    // 编辑商品数量
+    async handleChangeNum(item) {
+      const loading = elLoading()
+      const res = await editCartRequest({
+        productId: item.productId,
+        productNum: item.productNum,
+      })
+      loading.close()
+      if (!res.errCodeTip) {
+        this.getList()
       }
     }
   },
