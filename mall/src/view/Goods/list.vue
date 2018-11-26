@@ -26,11 +26,11 @@
       <Col span="5" offset="1" v-for="item in list" :key="item.productId">
         <Card shadow>
           <p slot="title">{{item.productName}}</p>
-          <Button type="primary" icon="ios-add-circle-outline"
-            size="small" style="float:right" @click="addCart(item)"
-          >加入购物车</Button>
+          <img :src="item.productImage" :alt="item.productName">
           <p>{{item.salePrice}} 元</p>
-          <p>{{item.productImage}}</p>
+          <Button type="primary" icon="ios-add-circle-outline"
+            size="small" @click="addCart(item)"
+          >加入购物车</Button>
         </Card>
       </Col>
     </Row>

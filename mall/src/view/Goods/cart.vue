@@ -1,5 +1,10 @@
 <template>
-  <Table stripe border size="small" highlight-row :loading="loading" :height="600" :columns="columns1" :data="tableList" />
+  <Table
+    stripe border size="small" highlight-row
+    :loading="loading" :height="600"
+    :columns="columns1" :data="tableList"
+    @on-selection-change="selectionChange"
+  />
 </template>
 
 <script>
@@ -17,10 +22,12 @@ export default {
         },
         {
           title: '商品名',
+          align: 'center',
           key: 'productName'
         },
         {
           title: '图片',
+          align: 'center',
           key: 'productImage',
           render: (h, params) => {
             return h('img', {
@@ -32,10 +39,12 @@ export default {
         },
         {
           title: '价格',
+          align: 'center',
           key: 'salePrice'
         },
         {
           title: '数量',
+          align: 'center',
           key: 'productNum',
           render: (h, params) => {
             return h('InputNumber', {
@@ -57,6 +66,7 @@ export default {
         },
         {
           title: '操作',
+          align: 'center',
           key: 'action',
           render: (h, params) => {
             return h('Button', {
@@ -74,12 +84,13 @@ export default {
         }
       ],
       loading: false,
-      tableList: []
+      tableList: [],
+      cartSelect: []
     }
   },
   methods: {
     // 获取列表
-    async getList() {
+    async getList () {
       this.loading = true;
       const res = await getCartRequest()
       this.loading = false;
@@ -88,7 +99,7 @@ export default {
       }
     },
     // 删除商品
-    async handleDelect(item) {
+    async handleDelect (item) {
       await elConfirm(`确认删除 ${item.productName} ? `)
       const res = await delCartRequest({
         productId: item.productId
@@ -99,7 +110,7 @@ export default {
       }
     },
     // 编辑商品数量
-    async handleChangeNum(item) {
+    async handleChangeNum (item) {
       const loading = elLoading()
       const res = await editCartRequest({
         productId: item.productId,
@@ -109,6 +120,11 @@ export default {
       if (!res.errCodeTip) {
         this.getList()
       }
+    },
+    // 选择框改变事件
+    selectionChange (item) {
+      this.cartSelect = item;
+      console.log(this.cartSelect)
     }
   },
   created() {
