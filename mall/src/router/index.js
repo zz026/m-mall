@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
-import Goods from '@/view/Goods/index'
-import GoodsList from '@/view/Goods/list'
-import GoodsCart from '@/view/Goods/cart'
+import { asyncImport } from '@/utils'
 
 Vue.use(Router)
 
@@ -16,7 +14,7 @@ export default new Router({
     },
     {
       path: '/goods',
-      component: Goods,
+      component: asyncImport('Goods/index'),
       children: [
         {
           path: '/',
@@ -24,11 +22,15 @@ export default new Router({
         },
         {
           path: 'list',
-          component: GoodsList,
+          component: asyncImport('Goods/list'),
         },
         {
           path: 'cart',
-          component: GoodsCart,
+          component: asyncImport('Goods/cart'),
+        },
+        {
+          path: 'add',
+          component: asyncImport('Goods/add'),
         }
       ]
     }

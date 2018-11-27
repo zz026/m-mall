@@ -24,15 +24,15 @@ router.get('/list', function (req, res, next) {
   const skip = (pageIndex - 1) * pageSize
   const minPrice = parseInt(req.param('minPrice'))
   const maxPrice = parseInt(req.param('maxPrice'))
-  const productName = (req.param('productName'))
+  const name = (req.param('name'))
 
   const params = {}
-  params.salePrice = {
+  params.price = {
     '$gte': minPrice || 0,
     '$lte': maxPrice || 10000,
   }
-  params.productName = {
-    $regex: productName || ''
+  params.name = {
+    $regex: name || ''
   }
 
   const goodsModel = Goods.find(params)
@@ -42,7 +42,7 @@ router.get('/list', function (req, res, next) {
     if (!err) total = doc.length
   })
   // 排序，跳过,生成
-  goodsModel.sort({ 'salePrice': sort }).skip(skip).limit(pageSize)
+  goodsModel.sort({ 'price': sort }).skip(skip).limit(pageSize)
 
   goodsModel.exec(function (err, doc) {
     const findUser = utils.result(res, err)
@@ -62,46 +62,75 @@ router.get('/list', function (req, res, next) {
 // 添加购物车
 router.post('/addCart', function (req, res, next) {
   const userId = req.cookies.userId;
-  const productId = req.body.productId;
+  const _id = req.body._id;
   const UserModel = require('../model/user');
   UserModel.findOne({ userId }, function (err, userInfoDoc) {
     const findUser = utils.result(res, err)
     if (findUser === 'success') {
-      Goods.findOne({ productId }, function(err2, goodInfoDoc) {
+      Goods.findOne({ _id }, function(err2, goodInfoDoc) {
         const findGood = utils.result(res, err2)
         if (findGood === 'success') {
           if (userInfoDoc.cartList.length) {
             const goodIndex = userInfoDoc.cartList.findIndex(val => {
-              return val.productId === productId
+              return val._id === _id
             })
-            console.log('goodIndex', goodIndex)
             if (goodIndex !== -1) {
-              userInfoDoc.cartList[goodIndex].productNum++
+              userInfoDoc.cartList[goodIndex].num++
             } else {
-              console.log('goodInfoDoc', goodInfoDoc)
               userInfoDoc.cartList.push({
-                productId: goodInfoDoc.productId,
-                productName: goodInfoDoc.productName,
-                productImage: goodInfoDoc.productImage,
-                salePrice: goodInfoDoc.salePrice,
-                productNum: 1,
-                isChecked: 1
+                name: goodInfoDoc.name,
+                image: goodInfoDoc.image,
+                price: goodInfoDoc.price,
+                num: 1,
               })
             }
           } else {
             userInfoDoc.cartList.push({
-              productId: goodInfoDoc.productId,
-              productName: goodInfoDoc.productName,
-              productImage: goodInfoDoc.productImage,
-              salePrice: goodInfoDoc.salePrice,
-              productNum: 1,
-              isChecked: 1
+              name: goodInfoDoc.name,
+              image: goodInfoDoc.image,
+              price: goodInfoDoc.price,
+              num: 1,
             })
           }
           userInfoDoc.save()
           utils.sussess(res)
         }
       })
+    }
+  })
+})
+
+// 新增商品
+router.post('/add', function(req, res, next) {
+  const name = req.body.name
+  const price = parseInt(req.body.price)
+  const image = req.body.image
+  if (!name) {
+    return utils.fail(res, { message: '商品名称为空' })
+  }
+  if (!price) {
+    return utils.fail(res, { message: '商品价格为空' })
+  }
+  if (!image) {
+    return utils.fail(res, { message: '商品链接为空' })
+  }
+  Goods.findOne({name}, function(err, doc) {
+    const findGoods = utils.result(res, err)
+    if (findGoods === 'success') {
+      if (doc) {
+        utils.fail(res, { message: '该商品已存在！' })
+      } else {
+        Goods.create({
+          'name': name,
+          'price': price,
+          'image': image,
+        }, function(err2, doc2) {
+          const createGood = utils.result(res, err2)
+          if (createGood === 'success') {
+            utils.sussess(res, doc2, '添加商品成功！')
+          }
+        })
+      }
     }
   })
 })

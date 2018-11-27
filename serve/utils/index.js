@@ -7,10 +7,10 @@ module.exports = {
       return 'success'
     }
   },
-  sussess: function(res, data = '') {
+  sussess: function(res, data = '', msg = '请求成功！') {
     return res.json({
       code: 0,
-      msg: '请求成功！',
+      msg,
       data
     })
   },

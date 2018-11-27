@@ -23,16 +23,16 @@ export default {
         {
           title: '商品名',
           align: 'center',
-          key: 'productName'
+          key: 'name'
         },
         {
           title: '图片',
           align: 'center',
-          key: 'productImage',
+          key: 'image',
           render: (h, params) => {
             return h('img', {
               attrs: {
-                src: params.row.productImage, style: 'width: 100px;height: 100px;border-radius: 2px;'
+                src: params.row.image, style: 'width: 100px;height: 100px;border-radius: 2px;'
               }
             });
           }
@@ -40,24 +40,24 @@ export default {
         {
           title: '价格',
           align: 'center',
-          key: 'salePrice'
+          key: 'price'
         },
         {
           title: '数量',
           align: 'center',
-          key: 'productNum',
+          key: 'num',
           render: (h, params) => {
             return h('InputNumber', {
               props: {
                 min: 1,
                 max: 10,
-                value: params.row.productNum,
+                value: params.row.num,
                 size: 'small'
               },
               on: {
                 'on-change': (val) => {
-                  // that.tableList[params.index].productNum = val
-                  params.row.productNum = val
+                  // that.tableList[params.index].num = val
+                  params.row.num = val
                   this.handleChangeNum(params.row)
                 }
               }
@@ -100,12 +100,12 @@ export default {
     },
     // 删除商品
     async handleDelect (item) {
-      await elConfirm(`确认删除 ${item.productName} ? `)
+      await elConfirm(`确认删除 ${item.name} ? `)
       const res = await delCartRequest({
-        productId: item.productId
+        _id: item._id
       });
       if (!res.errCodeTip) {
-        this.$Message.success(`${item.productName}删除成功！`);
+        this.$Message.success(`${item.name}删除成功！`);
         this.getList()
       }
     },
@@ -113,8 +113,8 @@ export default {
     async handleChangeNum (item) {
       const loading = elLoading()
       const res = await editCartRequest({
-        productId: item.productId,
-        productNum: item.productNum,
+        _id: item._id,
+        num: item.num,
       })
       loading.close()
       if (!res.errCodeTip) {

@@ -13,8 +13,11 @@
       </Header>
       <Content :style="{padding: '0 50px'}">
         <div id="nav">
-          <router-link to="/">Home</router-link> |
-          <router-link to="/goods">goods</router-link>
+          <router-link to="/">Home</router-link>
+          <Divider type="vertical" />
+          <router-link to="/goods/list">商品列表</router-link>
+          <Divider type="vertical" />
+          <router-link to="/goods/add">添加商品</router-link>
         </div>
         <router-view />
       </Content>
@@ -104,16 +107,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<style lang="scss" scoped>
 #nav {
   padding: 30px;
+  text-align: center;
   a {
     font-weight: bold;
     color: #2c3e50;
@@ -122,9 +119,6 @@ export default {
     }
   }
 }
-</style>
-
-<style lang="scss" scoped>
 .ivu-layout-header {
   color: #fff;
   display: flex;
@@ -139,5 +133,8 @@ export default {
 }
 .ivu-layout-content {
   min-height: 80vh;
+}
+.ivu-layout-footer {
+  text-align: center;
 }
 </style>

@@ -1,9 +1,8 @@
 <template>
   <div>
-    <div>商品列表</div>
     <Form ref="formData" :model="formData" inline>
-        <FormItem prop="productName">
-          <Input type="text" v-model="formData.productName" placeholder="商品名" />
+        <FormItem prop="name">
+          <Input type="text" v-model="formData.name" placeholder="商品名" />
         </FormItem>
         <FormItem prop="minPrice">
           <Input type="text" v-model="formData.minPrice" placeholder="最小值" />
@@ -23,18 +22,18 @@
         </FormItem>
     </Form>
     <Row style="background:#eee;padding:20px">
-      <Col span="5" offset="1" v-for="item in list" :key="item.productId">
+      <Col span="4" offset="1" v-for="item in list" :key="item.productId">
         <Card shadow>
-          <p slot="title">{{item.productName}}</p>
-          <img :src="item.productImage" :alt="item.productName">
-          <p>{{item.salePrice}} 元</p>
+          <p slot="title">{{item.name}}</p>
+          <img :src="item.image" :alt="item.name">
+          <p>{{item.price}} 元</p>
           <Button type="primary" icon="ios-add-circle-outline"
             size="small" @click="addCart(item)"
           >加入购物车</Button>
         </Card>
       </Col>
     </Row>
-    <Page :total="pageConfig.total" :page-size="pageConfig.pageSize" @on-change="pageChange" />
+    <Page :total="pageConfig.total" :page-size="pageConfig.pageSize" @on-change="pageChange" v-if="list.length" />
   </div>
 </template>
 
@@ -46,7 +45,7 @@ export default {
     return {
       list: [],
       formData: {
-        productName: '',
+        name: '',
         minPrice: '',
         maxPrice: '',
         sort: 1,
@@ -86,7 +85,7 @@ export default {
     },
     async addCart(item) {
       const res = await addCartRequest({
-        productId: item.productId,
+        _id: item._id,
       })
       if (!res.errCodeTip) {
         this.$Message.success('添加购物车成功！');
@@ -102,11 +101,17 @@ export default {
 <style lang="scss" scoped>
 .ivu-col {
   margin-bottom: 20px;
+  text-align: center;
+  img {
+    width: 100px;
+    height: 100px;
+  }
+  .ivu-btn {
+    margin: 10px 0;
+  }
 }
 .ivu-btn {
   margin-right: 10px;
 }
-.ivu-page {
-  margin: 20px 0;
-}
+
 </style>

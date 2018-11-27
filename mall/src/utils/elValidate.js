@@ -64,3 +64,19 @@ export const checkIdcardNo = (rule, value, callback) => {
     callback()
   }
 }
+
+// 验证价格
+export const validatePrice = (rule, value, callback) => {
+  if (!value) {
+    return callback(new Error('请输入商品价格'));
+  }
+  if (!(/^-?\d+\.?\d{0,2}$/).test(value)) {
+    callback(new Error('价格格式不正确'));
+  } else {
+    if (value > 10000) {
+      callback(new Error('价格在1~10000之间'));
+    } else {
+      callback();
+    }
+  }
+};

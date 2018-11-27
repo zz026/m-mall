@@ -82,8 +82,8 @@ router.get('/cart', function(req, res, next) {
 // 购物车删除
 router.post('/cart/del', function(req, res, next) {
   const userId = req.cookies.userId;
-  const productId = req.body.productId
-  if (!productId) {
+  const _id = req.body._id
+  if (!_id) {
     utils.fail(res, { message: '商品id为空' }, '错误')
     return;
   }
@@ -92,7 +92,7 @@ router.post('/cart/del', function(req, res, next) {
   }, {
     '$pull': {
       'cartList': {
-        'productId': productId
+        '_id': _id
       }
     }
   }, function(err) {
@@ -106,23 +106,23 @@ router.post('/cart/del', function(req, res, next) {
 // 购物车编辑
 router.post('/cart/edit', function(req, res, next) {
   const userId = req.cookies.userId;
-  const productId = req.body.productId;
-  const productNum = req.body.productNum;
-  if (!productId) {
+  const _id = req.body._id;
+  const num = req.body.num;
+  if (!_id) {
     utils.fail(res, { message: '商品id为空' }, '错误')
     return;
   }
-  if (!productNum) {
+  if (!num) {
     utils.fail(res, { message: '商品数量为空' }, '错误')
     return;
   }
   userModel.update(
     {
       'userId': userId,
-      'cartList.productId': productId
+      'cartList._id': _id
     },
     {
-      'cartList.$.productNum': productNum
+      'cartList.$.num': num
     },
     function(err, doc) {
       const flag = utils.result(res, err)

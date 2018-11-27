@@ -5,12 +5,10 @@ const UserSchema = new mongoose.Schema({
   'userPwd': String,
   'orderList': Array,
   'cartList': [{
-    'productId': String,
-    'productName': String,
-    'productImage': String,
-    'salePrice': Number,
-    'productNum': Number,
-    'isChecked': Number
+    'name': String,
+    'image': String,
+    'price': Number,
+    'num': Number
   }],
   'addressList': Array
 })
