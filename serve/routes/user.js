@@ -146,7 +146,8 @@ router.post('/cart/edit', function(req, res, next) {
 // 提交订单
 router.post('/order/submit', function(req, res, next) {
   const userId = req.cookies.userId;
-  const orderList = req.body.orderList
+  const { orderList, name, phone, province, city, area, address } = req.body
+  console.log('req.body', req.body)
   // 找到商品id
   const ids = orderList.map((val) => val.id)
   const GoodsModel = require('../model/goods');
@@ -177,8 +178,7 @@ router.post('/order/submit', function(req, res, next) {
               totalprice: totalPrice.toFixed(2),
               createtime: Date.now(),
               addressInfo: {
-                name: '我我',
-                phone: 13800138000
+                name, phone, province, city, area, address
               },
               goodsList: doc2
             }

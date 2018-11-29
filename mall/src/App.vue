@@ -67,7 +67,7 @@ export default {
         ],
         userPwd: [
           { required: true, message: '请填写密码', trigger: 'blur' },
-          { type: 'string', min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
+          { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
         ]
       }
     }
@@ -81,6 +81,7 @@ export default {
             this.$Message.success('登录成功！');
             this.userName = res.userName;
             this.showModal = false;
+            this.$router.go(0)
           }
         } else {
           this.$Message.error('请输入内容!');
@@ -92,6 +93,7 @@ export default {
       if (!res.errCodeTip) {
         this.userName = '';
         this.$Message.success('退出成功！');
+        this.$router.push({ path: '/'})
       }
     },
     async checkLogin() {

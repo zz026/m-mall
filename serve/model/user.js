@@ -17,9 +17,10 @@ const UserSchema = new mongoose.Schema({
     'addressInfo': {
       'name': String,
       'phone': String,
-      'sheng': String,
-      'shi': String,
-      'qu': String,
+      'province': String,
+      'city': String,
+      'area': String,
+      'address': String
     },
     'goodsList': [
       {

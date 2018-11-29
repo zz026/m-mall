@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Button type="primary" @click="sumbitOrders">提交订单</Button>
+    <Button type="primary" @click="openModal">提交订单</Button>
     <Tag type="dot" color="primary" class="fr">总计：{{total}} 元</Tag>
     <Table
       stripe border size="small" highlight-row
@@ -8,13 +8,39 @@
       :columns="columns1" :data="tableList"
       @on-selection-change="selectionChange"
     />
+    <Modal
+      v-model="showModal"
+      :mask-closable="false"
+      width="600"
+      title="订单地址"
+    >
+      <Form ref="formData" :model="formData" :rules="ruleInline" :label-width="80">
+        <FormItem prop="name" label="收货人">
+          <Input type="text" v-model.trim="formData.name" placeholder="请填写收货人" />
+        </FormItem>
+        <FormItem prop="phone" label="电话">
+          <Input type="text" v-model.trim="formData.phone" placeholder="请填写收货电话" />
+        </FormItem>
+        <FormItem prop="area" label="地区">
+          <v-distpicker :province="formData.province" :city="formData.city" :area="formData.area" @selected="onSelected" />
+        </FormItem>
+        <FormItem prop="address" label="收货地址">
+          <Input type="textarea" :rows="4" v-model.trim="formData.address" placeholder="请填写收货地址" />
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="primary" @click="handleSubmit('formData')">确 认</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
 import { getCartRequest, delCartRequest, editCartRequest } from '@/api/good';
 import { elConfirm, elLoading } from '@/utils/tipTools';
+import { checkMobile } from '@/utils/elValidate';
 import { orderSubmitRequest } from '@/api/order'
+import VDistpicker from 'v-distpicker'
 
 export default {
   data() {
@@ -37,7 +63,7 @@ export default {
           render: (h, params) => {
             return h('img', {
               attrs: {
-                src: params.row.image, style: 'width: 100px;height: 100px;border-radius: 2px;'
+                src: params.row.image, style: 'margin: 10px 0;width: 100px; height: 80px;border-radius: 2px;'
               }
             });
           }
@@ -94,8 +120,35 @@ export default {
       tableList: [],
       // 总价
       total: 0,
+      showModal: false,
       // 表格选中内容
-      cartSelect: []
+      cartSelect: [],
+      formData: {
+        name: '',
+        phone: '',
+        province: '',
+        city: '',
+        area: '',
+        address: ''
+      },
+      ruleInline: {
+        name: [
+          { required: true, message: '请填写收货人', trigger: 'blur' },
+          { max: 10, message: '长度最多为10', trigger: 'blur' },
+        ],
+        phone: [
+          // { required: true, message: '请填写收货电话', trigger: 'blur' },
+          { required: true, validator: checkMobile, trigger: 'blur' }
+        ],
+        area: [
+          { required: true, message: '请选择地区', trigger: 'change' },
+          { max: 10, message: '长度最多为10', trigger: 'blur' },
+        ],
+        address: [
+          { required: true, message: '请填写收货地址', trigger: 'blur' },
+          { max: 50, message: '长度最多为50', trigger: 'blur' },
+        ],
+      }
     }
   },
   methods: {
@@ -143,14 +196,49 @@ export default {
       });
       this.total = total
     },
+    // 打开模态框
+    openModal () {
+      if (!this.cartSelect.length) return this.$Message.warning(`请先勾选商品！`);
+      this.handleReset()
+      this.showModal = true
+    },
+    // 地区选择器选择事件
+    onSelected(data) {
+      this.formData.province = data.province.value;
+      this.formData.city = data.city.value;
+      this.formData.area = data.area.value;
+    },
+    // 提交订单
+    handleSubmit () {
+      if (!this.cartSelect.length) return this.$Message.warning(`请先勾选商品！`);
+      this.$refs.formData.validate((valid) => {
+        if (valid) {
+          if (!this.formData.province || !this.formData.city || !this.formData.area) {
+            return this.$Message.warning('请选择地区')
+          }
+          this.sumbitOrders()
+        } else {
+          this.$Message.error('请输入内容!');
+        }
+      })
+    },
+    // 重置表单
+    handleReset () {
+      this.$refs.formData.resetFields();
+      this.formData.province = '';
+      this.formData.city = '';
+      this.formData.area = '';
+    },
     // 提交订单
     async sumbitOrders() {
-      if (!this.cartSelect.length) return this.$Message.warning(`请先勾选商品！`);
+      const loading = elLoading()
       const res = await orderSubmitRequest({
-        orderList: this.cartSelect
+        orderList: this.cartSelect,
+        ...this.formData
       });
+      loading.close()
       if (!res.errCodeTip) {
-        console.log(res)
+        this.showModal = false;
         this.$Message.success('订单创建成功!')
         this.$router.push({ path: '/order/detail/' + res.orderId })
       }
@@ -159,5 +247,6 @@ export default {
   created() {
     this.getList()
   },
+  components: { VDistpicker }
 }
 </script>
