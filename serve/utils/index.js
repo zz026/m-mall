@@ -1,3 +1,4 @@
+const md5 =  require('js-md5');
 module.exports = {
   result: function(res, err, data = '') {
     if (err) {
@@ -20,5 +21,10 @@ module.exports = {
       msg: err.message,
       data
     })
+  },
+  createId: function(orderTitle = '0923') {
+    let id = Date.now() + Math.floor(Math.random() * 1000)
+    id = md5(id.toString())
+    return orderTitle + id
   }
 }

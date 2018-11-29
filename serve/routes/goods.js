@@ -32,7 +32,7 @@ router.get('/list', function (req, res, next) {
     '$lte': maxPrice || 10000,
   }
   params.name = {
-    $regex: name || ''
+    '$regex': name || ''
   }
 
   const goodsModel = Goods.find(params)
@@ -62,22 +62,23 @@ router.get('/list', function (req, res, next) {
 // 添加购物车
 router.post('/addCart', function (req, res, next) {
   const userId = req.cookies.userId;
-  const _id = req.body._id;
+  const id = req.body.id;
   const UserModel = require('../model/user');
   UserModel.findOne({ userId }, function (err, userInfoDoc) {
     const findUser = utils.result(res, err)
     if (findUser === 'success') {
-      Goods.findOne({ _id }, function(err2, goodInfoDoc) {
+      Goods.findOne({ id }, function(err2, goodInfoDoc) {
         const findGood = utils.result(res, err2)
         if (findGood === 'success') {
           if (userInfoDoc.cartList.length) {
             const goodIndex = userInfoDoc.cartList.findIndex(val => {
-              return val._id === _id
+              return val.id === id
             })
             if (goodIndex !== -1) {
               userInfoDoc.cartList[goodIndex].num++
             } else {
               userInfoDoc.cartList.push({
+                id: goodInfoDoc.id,
                 name: goodInfoDoc.name,
                 image: goodInfoDoc.image,
                 price: goodInfoDoc.price,
@@ -86,6 +87,7 @@ router.post('/addCart', function (req, res, next) {
             }
           } else {
             userInfoDoc.cartList.push({
+              id: goodInfoDoc.id,
               name: goodInfoDoc.name,
               image: goodInfoDoc.image,
               price: goodInfoDoc.price,
@@ -121,6 +123,7 @@ router.post('/add', function(req, res, next) {
         utils.fail(res, { message: '该商品已存在！' })
       } else {
         Goods.create({
+          'id': utils.createId(),
           'name': name,
           'price': price,
           'image': image,

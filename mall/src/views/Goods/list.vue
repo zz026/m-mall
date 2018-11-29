@@ -10,10 +10,10 @@
         <FormItem prop="maxPrice">
           <Input type="text" v-model="formData.maxPrice" placeholder="最大值" />
         </FormItem>
-        <FormItem prop="sort">
+        <FormItem prop="sort" label="价格：" :label-width="60">
           <RadioGroup v-model="formData.sort">
-            <Radio :label="1">正序</Radio>
-            <Radio :label="-1">倒序</Radio>
+            <Radio :label="-1">高→低</Radio>
+            <Radio :label="1">低→高</Radio>
           </RadioGroup>
         </FormItem>
         <FormItem>
@@ -22,7 +22,7 @@
         </FormItem>
     </Form>
     <Row style="background:#eee;padding:20px">
-      <Col span="4" offset="1" v-for="item in list" :key="item.productId">
+      <Col span="5" offset="1" v-for="item in list" :key="item.productId">
         <Card shadow>
           <p slot="title">{{item.name}}</p>
           <img :src="item.image" :alt="item.name">
@@ -48,7 +48,7 @@ export default {
         name: '',
         minPrice: '',
         maxPrice: '',
-        sort: 1,
+        sort: -1,
       },
       pageConfig: {
         pageIndex: 1,
@@ -85,7 +85,7 @@ export default {
     },
     async addCart(item) {
       const res = await addCartRequest({
-        _id: item._id,
+        id: item.id,
       })
       if (!res.errCodeTip) {
         this.$Message.success('添加购物车成功！');

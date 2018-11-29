@@ -33,6 +33,24 @@ export default new Router({
           component: asyncImport('Goods/add'),
         }
       ]
+    },
+    {
+      path: '/order',
+      component: asyncImport('order/index'),
+      children: [
+        {
+          path: '/',
+          redirect: 'list'
+        },
+        {
+          path: 'list',
+          component: asyncImport('order/list'),
+        },
+        {
+          path: 'detail/:id',
+          component: asyncImport('order/detail'),
+        },
+      ]
     }
   ]
 })

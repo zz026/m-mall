@@ -1,15 +1,20 @@
 <template>
-  <Table
-    stripe border size="small" highlight-row
-    :loading="loading" :height="600"
-    :columns="columns1" :data="tableList"
-    @on-selection-change="selectionChange"
-  />
+  <div>
+    <Button type="primary" @click="sumbitOrders">提交订单</Button>
+    <Tag type="dot" color="primary" class="fr">总计：{{total}} 元</Tag>
+    <Table
+      stripe border size="small" highlight-row
+      :loading="loading" :height="600"
+      :columns="columns1" :data="tableList"
+      @on-selection-change="selectionChange"
+    />
+  </div>
 </template>
 
 <script>
 import { getCartRequest, delCartRequest, editCartRequest } from '@/api/good';
 import { elConfirm, elLoading } from '@/utils/tipTools';
+import { orderSubmitRequest } from '@/api/order'
 
 export default {
   data() {
@@ -71,8 +76,9 @@ export default {
           render: (h, params) => {
             return h('Button', {
               props: {
-                type: 'primary',
-                size: 'small'
+                type: 'text',
+                size: 'small',
+                icon: 'md-remove-circle',
               },
               on: {
                 click: () => {
@@ -84,7 +90,11 @@ export default {
         }
       ],
       loading: false,
+      // 表格
       tableList: [],
+      // 总价
+      total: 0,
+      // 表格选中内容
       cartSelect: []
     }
   },
@@ -102,7 +112,7 @@ export default {
     async handleDelect (item) {
       await elConfirm(`确认删除 ${item.name} ? `)
       const res = await delCartRequest({
-        _id: item._id
+        id: item.id
       });
       if (!res.errCodeTip) {
         this.$Message.success(`${item.name}删除成功！`);
@@ -113,7 +123,7 @@ export default {
     async handleChangeNum (item) {
       const loading = elLoading()
       const res = await editCartRequest({
-        _id: item._id,
+        id: item.id,
         num: item.num,
       })
       loading.close()
@@ -123,8 +133,27 @@ export default {
     },
     // 选择框改变事件
     selectionChange (item) {
-      this.cartSelect = item;
-      console.log(this.cartSelect)
+      let total = 0
+      this.cartSelect = item.map(val => {
+        total = val.price * val.num;
+        return {
+          id: val.id,
+          num: val.num
+        }
+      });
+      this.total = total
+    },
+    // 提交订单
+    async sumbitOrders() {
+      if (!this.cartSelect.length) return this.$Message.warning(`请先勾选商品！`);
+      const res = await orderSubmitRequest({
+        orderList: this.cartSelect
+      });
+      if (!res.errCodeTip) {
+        console.log(res)
+        this.$Message.success('订单创建成功!')
+        this.$router.push({ path: '/order/detail/' + res.orderId })
+      }
     }
   },
   created() {

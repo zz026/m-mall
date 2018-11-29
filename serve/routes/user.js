@@ -3,6 +3,10 @@ var router = express.Router();
 const utils = require('../utils/index');
 const userModel = require('../model/user')
 
+/*
+  -------------------- 用户模块 -------------------------------------------------------------
+*/
+// 登录
 router.post('/login', function(req, res, next) {
   const userName = req.body.userName;
   const userPwd = req.body.userPwd;
@@ -26,12 +30,12 @@ router.post('/login', function(req, res, next) {
           userName: doc.userName,
         }, '登录成功')
       } else {
-        utils.fail(res, { message: '账号或密码错误!!' }, '账号或密码错误')
+        utils.fail(res, { message: '账号或密码错误!!' }, '')
       }
     }
   })
 });
-
+// 退出登录
 router.post('/logout', function(req, res, next) {
   res.cookie('userId', '', {
     path: '/',
@@ -41,21 +45,13 @@ router.post('/logout', function(req, res, next) {
     path: '/',
     maxAge: -1
   })
-  res.json({
-    code: 0,
-    msg: '退出成功！',
-    data: ''
-  })
+  utils.sussess(res, '', '退出成功！')
 })
-
+// 检查登录
 router.get('/checkLogin', function(req, res, next) {
   if (req.cookies.userId) {
-    res.json({
-      code: 0,
-      msg: '',
-      data: {
-        userName: req.cookies.userName
-      }
+    utils.sussess(res, {
+      userName: req.cookies.userName
     })
   } else {
     res.json({
@@ -65,7 +61,13 @@ router.get('/checkLogin', function(req, res, next) {
     })
   }
 })
+/*
+  -------------------- 用户模块 -------------------------------------------------------------
+*/
 
+/*
+  -------------------- 购物车模块 -------------------------------------------------------------
+*/
 // 查看购物车
 router.get('/cart', function(req, res, next) {
   const userId = req.cookies.userId;
@@ -82,9 +84,9 @@ router.get('/cart', function(req, res, next) {
 // 购物车删除
 router.post('/cart/del', function(req, res, next) {
   const userId = req.cookies.userId;
-  const _id = req.body._id
-  if (!_id) {
-    utils.fail(res, { message: '商品id为空' }, '错误')
+  const id = req.body.id
+  if (!id) {
+    utils.fail(res, { message: '商品id为空' })
     return;
   }
   userModel.update({
@@ -92,7 +94,7 @@ router.post('/cart/del', function(req, res, next) {
   }, {
     '$pull': {
       'cartList': {
-        '_id': _id
+        'id': id
       }
     }
   }, function(err) {
@@ -106,20 +108,20 @@ router.post('/cart/del', function(req, res, next) {
 // 购物车编辑
 router.post('/cart/edit', function(req, res, next) {
   const userId = req.cookies.userId;
-  const _id = req.body._id;
+  const id = req.body.id;
   const num = req.body.num;
-  if (!_id) {
-    utils.fail(res, { message: '商品id为空' }, '错误')
+  if (!id) {
+    utils.fail(res, { message: '商品id为空' })
     return;
   }
   if (!num) {
-    utils.fail(res, { message: '商品数量为空' }, '错误')
+    utils.fail(res, { message: '商品数量为空' })
     return;
   }
   userModel.update(
     {
       'userId': userId,
-      'cartList._id': _id
+      'cartList.id': id
     },
     {
       'cartList.$.num': num
@@ -131,6 +133,71 @@ router.post('/cart/edit', function(req, res, next) {
       }
     }
   )
+})
+
+/*
+  -------------------- 购物车模块 -------------------------------------------------------------
+*/
+
+
+/*
+  -------------------- 订单模块 -------------------------------------------------------------
+*/
+// 提交订单
+router.post('/order/submit', function(req, res, next) {
+  const userId = req.cookies.userId;
+  const orderList = req.body.orderList
+  // 找到商品id
+  const ids = orderList.map((val) => val.id)
+  const GoodsModel = require('../model/goods');
+  userModel.findOne({ userId }, function(err1, doc1) {
+    const flag1 = utils.result(res, err1)
+    if (flag1 === 'success') {
+      // 找到用户后，找商品
+      GoodsModel.find({
+        id: {
+          '$in': ids
+        }
+      }, function(err2, doc2) {
+        const flag = utils.result(res, err2)
+        if (flag === 'success') {
+          // 如果存在商品 计算总价
+          if (doc2.length) {
+            let totalPrice = 0
+            doc2.forEach(val1 => {
+              orderList.forEach((val2) => {
+                if (val1.id === val2.id) {
+                  totalPrice += val1.price * val2.num
+                  val1.num = val2.num
+                }
+              })
+            })
+            const order = {
+              orderId: utils.createId('order'), 
+              totalprice: totalPrice.toFixed(2),
+              createtime: Date.now(),
+              addressInfo: {
+                name: '我我',
+                phone: 13800138000
+              },
+              goodsList: doc2
+            }
+            doc1.orderList.push(order)
+            // 删除购物车
+            doc1.cartList.forEach((val, index) => {
+              if (ids.includes(val.id)) {
+                doc1.cartList.splice(val, 1)
+              }
+            })
+            doc1.save();
+            utils.sussess(res, { orderId: order.orderId }, '订单创建成功!')
+          } else {
+            utils.fail(res, { message: '商品不存在' })
+          }
+        }
+      })
+    }
+  })
 })
 
 module.exports = router;
