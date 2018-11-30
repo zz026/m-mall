@@ -24,7 +24,7 @@ router.get('/list', function (req, res, next) {
   const skip = (pageIndex - 1) * pageSize
   const minPrice = parseInt(req.param('minPrice'))
   const maxPrice = parseInt(req.param('maxPrice'))
-  const name = (req.param('name'))
+  const name = req.param('name')
 
   const params = {}
   params.price = {
@@ -47,7 +47,7 @@ router.get('/list', function (req, res, next) {
   goodsModel.exec(function (err, doc) {
     const findUser = utils.result(res, err)
     if (findUser === 'success') {
-      utils.sussess(res, {
+      utils.success(res, {
         pageConfig: {
             total,
             pageSize,
@@ -58,49 +58,6 @@ router.get('/list', function (req, res, next) {
     }
   })
 });
-
-// 添加购物车
-router.post('/addCart', function (req, res, next) {
-  const userId = req.cookies.userId;
-  const id = req.body.id;
-  const UserModel = require('../model/user');
-  UserModel.findOne({ userId }, function (err, userInfoDoc) {
-    const findUser = utils.result(res, err)
-    if (findUser === 'success') {
-      Goods.findOne({ id }, function(err2, goodInfoDoc) {
-        const findGood = utils.result(res, err2)
-        if (findGood === 'success') {
-          if (userInfoDoc.cartList.length) {
-            const goodIndex = userInfoDoc.cartList.findIndex(val => {
-              return val.id === id
-            })
-            if (goodIndex !== -1) {
-              userInfoDoc.cartList[goodIndex].num++
-            } else {
-              userInfoDoc.cartList.push({
-                id: goodInfoDoc.id,
-                name: goodInfoDoc.name,
-                image: goodInfoDoc.image,
-                price: goodInfoDoc.price,
-                num: 1,
-              })
-            }
-          } else {
-            userInfoDoc.cartList.push({
-              id: goodInfoDoc.id,
-              name: goodInfoDoc.name,
-              image: goodInfoDoc.image,
-              price: goodInfoDoc.price,
-              num: 1,
-            })
-          }
-          userInfoDoc.save()
-          utils.sussess(res)
-        }
-      })
-    }
-  })
-})
 
 // 新增商品
 router.post('/add', function(req, res, next) {
@@ -127,10 +84,11 @@ router.post('/add', function(req, res, next) {
           'name': name,
           'price': price,
           'image': image,
+          'createtime': Date.now()
         }, function(err2, doc2) {
           const createGood = utils.result(res, err2)
           if (createGood === 'success') {
-            utils.sussess(res, doc2, '添加商品成功！')
+            utils.success(res, doc2, '添加商品成功！')
           }
         })
       }

@@ -1,13 +1,13 @@
 module.exports = {
   originalUrl: [
     // 检查登录
-    '/user/checkLogin',
+    '/api/user/checkLogin',
     // 登录
-    '/user/login',
+    '/api/user/login',
     // 退出
-    '/user/logout'
+    '/api/user/logout'
   ],
   path: [
-    '/goods/list'
+    '/api/goods/list'
   ]
 }

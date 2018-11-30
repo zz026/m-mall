@@ -8,7 +8,7 @@ module.exports = {
       return 'success'
     }
   },
-  sussess: function(res, data = '', msg = '请求成功！') {
+  success: function(res, data = '', msg = '请求成功！') {
     return res.json({
       code: 0,
       msg,
@@ -24,7 +24,7 @@ module.exports = {
   },
   createId: function(orderTitle = '0923') {
     let id = Date.now() + Math.floor(Math.random() * 1000)
-    id = md5(id.toString())
+    // id = md5(id.toString())
     return orderTitle + id
   }
 }

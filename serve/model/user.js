@@ -3,6 +3,7 @@ const UserSchema = new mongoose.Schema({
   'userId': String,
   'userName': String,
   'userPwd': String,
+  'createtime': Number,
   'cartList': [{
     'id': String,
     'name': String,
@@ -12,8 +13,10 @@ const UserSchema = new mongoose.Schema({
   }],
   'addressList': Array,
   'orderList': [{
+    'id': String,
     'totalprice': Number,
     'createtime': Number,
+    'status': Number,
     'addressInfo': {
       'name': String,
       'phone': String,

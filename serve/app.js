@@ -11,6 +11,8 @@ var whiteList = require('./utils/whiteList')
 var indexRouter = require('./routes/index');
 var userRouter = require('./routes/user');
 var goodsRouter = require('./routes/goods');
+var cartRouter = require('./routes/cart');
+var orderRouter = require('./routes/order');
 // var cors = require('cors');
 
 var app = express();
@@ -27,6 +29,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 全局路由拦截
 app.use(function(req, res, next) {
   if (req.cookies.userId) {
     next()
@@ -44,9 +47,12 @@ app.use(function(req, res, next) {
   }
 })
 
+const baseUrl = '/api'
 app.use('/', indexRouter);
-app.use('/user', userRouter);
-app.use('/goods', goodsRouter);
+app.use(baseUrl + '/user', userRouter);
+app.use(baseUrl + '/goods', goodsRouter);
+app.use(baseUrl + '/cart', cartRouter);
+app.use(baseUrl + '/order', orderRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

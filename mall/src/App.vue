@@ -81,7 +81,6 @@ export default {
             this.$Message.success('登录成功！');
             this.userName = res.userName;
             this.showModal = false;
-            this.$router.go(0)
           }
         } else {
           this.$Message.error('请输入内容!');
@@ -93,7 +92,7 @@ export default {
       if (!res.errCodeTip) {
         this.userName = '';
         this.$Message.success('退出成功！');
-        this.$router.push({ path: '/'})
+        this.$router.push({ path: '/' })
       }
     },
     async checkLogin() {

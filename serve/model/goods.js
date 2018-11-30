@@ -7,7 +7,8 @@ var GoodsSchema = new mongoose.Schema({
    'name': String,
    'price': Number,
    'image': String,
-   'num': { type: Number }
+   'num': { type: Number },
+   'createtime': Number
 })
 
 module.exports = mongoose.model('Goods', GoodsSchema, 'Goods')

@@ -12,20 +12,20 @@ export function addGoodRequest (data) {
 
 // 添加购物车
 export function addCartRequest (data) {
-  return post('/goods/addCart', data)
+  return post('/cart/add', data)
 }
 
 // 获取购物车列表
 export function getCartRequest (data) {
-  return get('/user/cart', data)
+  return get('/cart/list', data)
 }
 
 // 购物车删除
 export function delCartRequest (data) {
-  return post('/user/cart/del', data)
+  return post('/cart/del', data)
 }
 
 // 购物车编辑
 export function editCartRequest (data) {
-  return post('/user/cart/edit', data)
+  return post('/cart/edit', data)
 }
