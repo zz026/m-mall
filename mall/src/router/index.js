@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import { asyncImport } from '@/utils'
 
 Vue.use(Router)
@@ -9,12 +8,16 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'home',
+      component: asyncImport('home')
+    },
+    {
+      path: '/register',
+      component: asyncImport('auth/register')
     },
     {
       path: '/goods',
-      component: asyncImport('Goods/index'),
+      component: asyncImport('goods/index'),
       children: [
         {
           path: '/',
@@ -22,15 +25,15 @@ export default new Router({
         },
         {
           path: 'list',
-          component: asyncImport('Goods/list'),
+          component: asyncImport('goods/list'),
         },
         {
           path: 'cart',
-          component: asyncImport('Goods/cart'),
+          component: asyncImport('goods/cart'),
         },
         {
           path: 'add',
-          component: asyncImport('Goods/add'),
+          component: asyncImport('goods/add'),
         }
       ]
     },

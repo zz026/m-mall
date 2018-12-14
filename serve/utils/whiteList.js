@@ -5,7 +5,9 @@ module.exports = {
     // 登录
     '/api/user/login',
     // 退出
-    '/api/user/logout'
+    '/api/user/logout',
+    // 注册
+    '/api/user/register',
   ],
   path: [
     '/api/goods/list'

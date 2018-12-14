@@ -3,15 +3,15 @@
     <Layout>
       <Header>
         <div class="user">
-          <span>{{userName}}</span>
-          <span @click="showModal=true" v-if="!userName">登录</span>
-          <span @click="logOut" v-if="userName">退出登录</span>
-          <router-link to="/goods/cart" v-if="userName" style="color: #fff">
+          <span>{{realName}}</span>
+          <span @click="showModal=true" v-if="!realName">登录</span>
+          <span @click="logOut" v-if="realName">退出登录</span>
+          <router-link to="/goods/cart" v-if="realName" style="color: #fff">
             <Icon type="md-cart" :size="20" />
           </router-link>
         </div>
       </Header>
-      <Content :style="{padding: '0 50px'}">
+      <Content>
         <div id="nav">
           <router-link to="/">Home</router-link>
           <Divider type="vertical" />
@@ -21,7 +21,7 @@
         </div>
         <router-view />
       </Content>
-      <Footer class="layout-footer-center">2011-2016 &copy; TalkingData</Footer>
+      <Footer class="layout-footer-center">2018 &copy; 郑威威的商城</Footer>
     </Layout>
 
     <Modal
@@ -36,13 +36,14 @@
             <Icon type="ios-person-outline" slot="prepend"></Icon>
           </Input>
         </FormItem>
-        <FormItem prop="userPwd">
-          <Input type="password" v-model="formInline.userPwd" placeholder="请填写密码" @keyup.enter="handleSubmit">
+        <FormItem prop="password">
+          <Input type="password" v-model="formInline.password" placeholder="请填写密码" @keyup.enter="handleSubmit">
             <Icon type="ios-lock-outline" slot="prepend"></Icon>
           </Input>
         </FormItem>
       </Form>
       <div slot="footer">
+        <Button type="primary" @click="goRegister">立即注册</Button>
         <Button type="primary" @click="handleSubmit('formInline')">登 录</Button>
       </div>
     </Modal>
@@ -55,17 +56,17 @@ import { loginRequest, logoutRequest, checkLoginRequest } from '@/api/user';
 export default {
   data() {
     return {
-      userName: '',
+      realName: '',
       showModal: false,
       formInline: {
         userName: '',
-        userPwd: ''
+        password: ''
       },
       ruleInline: {
         userName: [
           { required: true, message: '请填写用户名', trigger: 'blur' }
         ],
-        userPwd: [
+        password: [
           { required: true, message: '请填写密码', trigger: 'blur' },
           { min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
         ]
@@ -73,13 +74,18 @@ export default {
     }
   },
   methods: {
+    // 去注册
+    goRegister() {
+      this.showModal = false;
+      this.$router.push({ path: '/register' })
+    },
     handleSubmit () {
       this.$refs.formInline.validate(async (valid) => {
         if (valid) {
           const res = await loginRequest(this.formInline);
           if (!res.errCodeTip) {
             this.$Message.success('登录成功！');
-            this.userName = res.userName;
+            this.realName = res.realName;
             this.showModal = false;
           }
         } else {
@@ -90,7 +96,7 @@ export default {
     async logOut() {
       const res = await logoutRequest();
       if (!res.errCodeTip) {
-        this.userName = '';
+        this.realName = '';
         this.$Message.success('退出成功！');
         this.$router.push({ path: '/' })
       }
@@ -98,7 +104,7 @@ export default {
     async checkLogin() {
       const res = await checkLoginRequest()
       if (!res.errCodeTip) {
-        this.userName = res.userName
+        this.realName = res.realName
       }
     }
   },

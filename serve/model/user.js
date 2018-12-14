@@ -2,7 +2,10 @@ const mongoose = require('mongoose')
 const UserSchema = new mongoose.Schema({
   'userId': String,
   'userName': String,
-  'userPwd': String,
+  'realName': String,
+  'password': String,
+  'gender': Number,
+  'headImg': String,
   'createtime': Number,
   'cartList': [{
     'id': String,
