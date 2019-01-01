@@ -30,6 +30,7 @@
           <Button type="primary" icon="ios-add-circle-outline"
             size="small" @click="addCart(item)"
           >加入购物车</Button>
+          <p>上传者： {{item.createName || '-'}}</p>
         </Card>
       </Col>
     </Row>

@@ -9,7 +9,8 @@
 </template>
 
 <script>
-import { getOrderListRequest } from '@/api/order'
+import { getOrderListRequest, changeOrderStatusRequest, removeOrderRequest } from '@/api/order'
+import { elConfirm } from '@/utils/tipTools';
 
 export default {
   data() {
@@ -88,18 +89,47 @@ export default {
           align: 'center',
           key: 'action',
           render: (h, params) => {
-            return h('Button', {
-              props: {
-                type: 'text',
-                size: 'small',
-                icon: 'md-remove-circle',
-              },
-              on: {
-                click: () => {
-                  this.handleDelect(params.row)
+            return h('div', [
+              h('Button', {
+                props: {
+                  type: 'success',
+                  size: 'small',
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.changeStatus(params.row, 2, '支付成功')
+                  }
                 }
-              }
-            }, '删除')
+              }, '支付成功'),
+              h('Button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                style: {
+                  marginRight: '5px'
+                },
+                on: {
+                  click: () => {
+                    this.changeStatus(params.row, 4, '取消订单')
+                  }
+                }
+              }, '取消订单'),
+              h('Button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.handleRemove(params.row)
+                  }
+                }
+              }, '删除订单')
+            ]);
           }
         }
       ],
@@ -108,12 +138,39 @@ export default {
   methods: {
     async getList() {
       this.loading = true;
-      const res = await getOrderListRequest({})
+      const res = await getOrderListRequest()
       this.loading = false;
       if (!res.errCodeTip) {
         this.tableList = res.list
       }
-    }
+    },
+    async changeStatus(item, status, msg) {
+      await elConfirm(`确认${msg} ?`)
+      const res = await changeOrderStatusRequest(
+        {
+          orderId: item.id,
+          status
+        }
+      )
+      if (!res.errCodeTip) {
+        console.log('res', res)
+        this.$Message.success(`订单修改成功！`);
+        this.getList()
+      }
+    },
+    async handleRemove(item) {
+      await elConfirm(`确认删除订单 ${item.id} ?`)
+      const res = await removeOrderRequest(
+        {
+          orderId: item.id
+        }
+      )
+      if (!res.errCodeTip) {
+        console.log('res', res)
+        this.$Message.success(`订单删除成功！`);
+        this.getList()
+      }
+    },
   },
   filters: {},
   props: {},

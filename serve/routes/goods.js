@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose')
 const Goods = require('../model/goods');
+const userModel = require('../model/user')
 const utils = require('../utils/index');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mall')
@@ -61,6 +62,7 @@ router.get('/list', function (req, res, next) {
 
 // 新增商品
 router.post('/add', function(req, res, next) {
+  const userId = req.cookies.userId;
   const name = req.body.name
   const price = parseInt(req.body.price)
   const image = req.body.image
@@ -79,17 +81,20 @@ router.post('/add', function(req, res, next) {
       if (doc) {
         utils.fail(res, { message: '该商品已存在！' })
       } else {
-        Goods.create({
-          'id': utils.createId(),
-          'name': name,
-          'price': price,
-          'image': image,
-          'createtime': Date.now()
-        }, function(err2, doc2) {
-          const createGood = utils.result(res, err2)
-          if (createGood === 'success') {
-            utils.success(res, doc2, '添加商品成功！')
-          }
+        userModel.findOne({ userId }, function(err2, userDoc) {
+          Goods.create({
+            'id': utils.createId(),
+            'name': name,
+            'price': price,
+            'image': image,
+            'createName': userDoc.realName,
+            'createtime': Date.now()
+          }, function(err3, doc3) {
+            const createGood = utils.result(res, err3)
+            if (createGood === 'success') {
+              utils.success(res, doc3, '添加商品成功！')
+            }
+          })
         })
       }
     }

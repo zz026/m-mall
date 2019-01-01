@@ -9,7 +9,7 @@ export function elMessage(message = '操作成功', type = 'success', duration =
   })
 }
 
-export function elConfirm(message = '操作成功', title = '提示', confirmButtonText = '确定') {
+export function elConfirm(message = '是否确认操作', title = '提示', confirmButtonText = '确定') {
   return new Promise((resolve) => {
     MessageBox.confirm(message, title, {
       cancelButtonText: '取消',

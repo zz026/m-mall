@@ -240,7 +240,7 @@ export default {
       if (!res.errCodeTip) {
         this.showModal = false;
         this.$Message.success('订单创建成功!')
-        this.$router.push({ path: '/order/detail/' + res.orderId })
+        this.$router.push({ path: '/order/list' })
       }
     }
   },

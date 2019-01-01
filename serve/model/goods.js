@@ -7,6 +7,7 @@ var GoodsSchema = new mongoose.Schema({
    'name': String,
    'price': Number,
    'image': String,
+   'createName': String,
    'num': { type: Number },
    'createtime': Number
 })

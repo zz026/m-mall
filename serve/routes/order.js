@@ -67,9 +67,65 @@ router.get('/list', function(req, res, next) {
   userModel.findOne({ userId }, function(err, doc) {
     const flag = utils.result(res, err);
     if (flag === 'success') {
-      utils.success(res, {
-        list: doc.orderList
+      const orderList = doc.orderList.map(val => {
+        const time = (Date.now() - val.createtime) / 1000 / 60
+        // 状态为1的，超过半小时订单超市
+        if (val.status === 1 && time > 30) {
+          console.log('超时', val)
+          val.status = 3;
+        }
+        return val;
       })
+      doc.save()
+      utils.success(res, {
+        list: orderList
+      })
+    }
+  })
+})
+
+// 订单状态
+router.post('/status', function(req, res, next) {
+  const userId = req.cookies.userId;
+  const orderId = req.body.orderId;
+  const status = req.body.status;
+  userModel.findOne({ userId }, function(err, doc) {
+    const flag = utils.result(res, err);
+    if (flag === 'success') {
+      const findOrderIndex = doc.orderList.findIndex((val) => {
+        return val.id === orderId
+      })
+      console.log('findOrderIndex', findOrderIndex)
+      if (findOrderIndex === -1) {
+        utils.fail(res, { message: '订单不存在' })
+      } else {
+        doc.orderList[findOrderIndex].status = status
+        doc.save()
+        utils.success(res, doc.orderList[findOrderIndex], '状态修改成功！')
+      }
+    }
+  })
+})
+
+// 删除订单
+router.post('/remove', function(req, res, next) {
+  const userId = req.cookies.userId;
+  const orderId = req.body.orderId;
+  userModel.findOne({ userId }, function(err, doc) {
+    const flag = utils.result(res, err);
+    if (flag === 'success') {
+      const findOrderIndex = doc.orderList.findIndex((val) => {
+        return val.id === orderId
+      })
+      console.log('findOrderIndex', findOrderIndex)
+      if (findOrderIndex === -1) {
+        utils.fail(res, { message: '订单不存在' })
+      } else {
+        if (doc.orderList[findOrderIndex].status === 2) return utils.fail(res, { message: '该订单已支付，无法删除！' })
+        doc.orderList.splice(findOrderIndex, 1)
+        doc.save()
+        utils.success(res, '', '订单删除成功')
+      }
     }
   })
 })
