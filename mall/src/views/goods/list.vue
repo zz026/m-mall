@@ -22,7 +22,7 @@
         </FormItem>
     </Form>
     <Row style="background:#eee;padding:20px">
-      <Col span="5" offset="1" v-for="item in list" :key="item.productId">
+      <Col :lg="5" :xs="24" v-for="item in list" :key="item.productId" style="margin-left: 2%">
         <Card shadow>
           <p slot="title">{{item.name}}</p>
           <img :src="item.image" :alt="item.name">
