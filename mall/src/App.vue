@@ -21,7 +21,10 @@
         </div>
         <router-view />
       </Content>
-      <Footer class="layout-footer-center">2018 &copy; 郑威威的商城</Footer>
+      <Footer class="layout-footer-center">
+        <div>2019 &copy; 郑威威的商城</div>
+        <a href="http://www.beian.miit.gov.cn">粤ICP备18043661号</a>
+      </Footer>
     </Layout>
 
     <Modal
