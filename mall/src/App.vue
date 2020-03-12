@@ -2,6 +2,7 @@
   <div id="app">
     <Layout>
       <Header>
+        <div class="left">星辰小站</div>
         <div class="user">
           <span>{{realName}}</span>
           <span @click="showModal=true" v-if="!realName">登录</span>
@@ -22,7 +23,7 @@
         <router-view />
       </Content>
       <Footer class="layout-footer-center">
-        <div>2019 &copy; 郑威威的商城</div>
+        <div>2019 &copy; 郑威威的商城(本商城仅限内容展示)</div>
         <a href="http://www.beian.miit.gov.cn">粤ICP备18043661号</a>
       </Footer>
     </Layout>
@@ -132,7 +133,11 @@ export default {
 .ivu-layout-header {
   color: #fff;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  .left {
+    color: #fff;
+    font-size: 30px;
+  }
   .user {
     width: 200px;
     span {
