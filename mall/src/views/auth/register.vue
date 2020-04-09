@@ -24,6 +24,12 @@
             </Radio>
           </RadioGroup>
         </FormItem>
+
+        <FormItem prop="phone" label="验证码">
+          <Input v-model.trim="formData.phone" placeholder="请输入手机号" style="width:200px" />
+          <Button @click="sendCode">发送验证码</Button>
+        </FormItem>
+
         <Button type="primary" @click="handleSubmit('formData')">注 册</Button>
       </Form>
   </div>
@@ -31,7 +37,7 @@
 
 <script>
 import { headList } from '@/assets/headList'
-import { registerRequest } from '@/api/user';
+import { registerRequest, sendSmsRequest } from '@/api/user';
 
 export default {
   data() {
@@ -42,6 +48,7 @@ export default {
         password: '',
         gender: '',
         headImg: '',
+        phone: ''
       },
       ruleInline: {
         userName: [
@@ -58,6 +65,9 @@ export default {
         ],
         headImg: [
           { required: true, message: '请选择头像' }
+        ],
+        phone: [
+          { required: true, message: '请填写手机号' }
         ],
       },
       headList: headList
@@ -78,6 +88,14 @@ export default {
           this.$Message.error('请输入内容!');
         }
       })
+    },
+    async sendCode() {
+      this.$refs.formData.validateField('phone');
+      if (!this.formData.phone) { return this.$Message.error('请填写手机号!'); }
+      const res = await sendSmsRequest(this.formData);
+      if (!res.errCodeTip) {
+        this.$Message.success('验证码已发送！已留意手机短信');
+      }
     }
   }
 }

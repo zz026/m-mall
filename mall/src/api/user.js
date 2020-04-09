@@ -19,3 +19,8 @@ export function checkLoginRequest (data) {
 export function registerRequest (data) {
   return post('/user/register', data)
 }
+
+// 发送sms
+export function sendSmsRequest (data) {
+  return post('/user/sms', data)
+}
